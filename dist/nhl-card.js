@@ -56,7 +56,7 @@ class NhlCard extends HTMLElement {
           let c = '';
           for (let i = 0; i < nhl_data.dates[0].games.length; i++) {
             if (this.getShowMatch(nhl_data.dates[0].games[i])) {
-              let matchDate = getDateFromNHLString(nhl_data.dates[0].games[i].gameDate);
+              let matchDate = this.getDateFromNHLString(nhl_data.dates[0].games[i].gameDate);
 
               let t = this.match_template.replace('{vnn}', nhl_data.dates[0].games[i].teams.away.team.name);
               t = t.replace('{hnn}', nhl_data.dates[0].games[i].teams.home.team.name);
@@ -65,7 +65,7 @@ class NhlCard extends HTMLElement {
               t = t.replace('{vs}', nhl_data.dates[0].games[i].teams.away.score);
               t = t.replace('{hs}', nhl_data.dates[0].games[i].teams.home.score);
               t = t.replace('{q}', nhl_data.dates[0].games[i].abstractGameState);
-              t = t.replace('{date}', getDayOfWeek(matchDate));
+              t = t.replace('{date}', this.getDayOfWeek(matchDate));
               t = t.replace('{time}', nhl_data.dates[0].games[i].gameDate + 'PM EST');
               if (this.config.my_team == nhl_data.dates[0].games[i].v) {
                 t = t.replace('{myteamv}', " nhl-card-bold");
