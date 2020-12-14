@@ -39,7 +39,7 @@ class NhlCard extends HTMLElement {
   set hass(hass) {
     if (!this.content) {
       this.card = document.createElement('ha-card');
-      this.card.header = 'NHL Games';
+      this.card.header = "Today's NHL Games";
       this.content = document.createElement('div');
       this.content.className = 'card-content';
       this.card.appendChild(this.content);
@@ -52,7 +52,7 @@ class NhlCard extends HTMLElement {
     fetch('https://statsapi.web.nhl.com/api/v1/schedule?startDate=2020-07-30&endDate=2020-08-05')
       .then((response) => {
         response.json().then((nhl_data) => {
-          this.card.header = "Today's NHL Games " + nhl_data.w;
+          this.card.header = "Today's NHL Games";
           let c = '';
           for (let i = 0; i < nhl_data.dates[0].games.length; i++) {
             if (this.getShowMatch(nhl_data.dates[0].games[i])) {
