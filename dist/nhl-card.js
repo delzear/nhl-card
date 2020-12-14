@@ -58,32 +58,26 @@ class NhlCard extends HTMLElement {
             if (this.getShowMatch(nhl_data.dates[0].games[i])) {
               let matchDate = this.getDateFromNHLString(nhl_data.dates[0].games[i].gameDate);
 
-              let t = this.match_template.replace('{vnn}', nhl_data.dates[0].games[i].teams.away.team.name);
-              t = t.replace('{hnn}', nhl_data.dates[0].games[i].teams.home.team.name);
-              t = t.replace('{v}', nhl_data.dates[0].games[i].teams.away.team.id);
-              t = t.replace('{h}', nhl_data.dates[0].games[i].teams.home.team.id);
-              t = t.replace('{vs}', nhl_data.dates[0].games[i].teams.away.score);
-              t = t.replace('{hs}', nhl_data.dates[0].games[i].teams.home.score);
-              t = t.replace('{q}', nhl_data.dates[0].games[i].abstractGameState);
-              t = t.replace('{date}', this.getDayOfWeek(matchDate));
-              t = t.replace('{time}', nhl_data.dates[0].games[i].gameDate + 'PM EST');
+              let t = this.match_template.replaceAll('{vnn}', nhl_data.dates[0].games[i].teams.away.team.name);
+              t = t.replaceAll('{hnn}', nhl_data.dates[0].games[i].teams.home.team.name);
+              t = t.replaceAll('{v}', nhl_data.dates[0].games[i].teams.away.team.id);
+              t = t.replaceAll('{h}', nhl_data.dates[0].games[i].teams.home.team.id);
+              t = t.replaceAll('{vs}', nhl_data.dates[0].games[i].teams.away.score);
+              t = t.replaceAll('{hs}', nhl_data.dates[0].games[i].teams.home.score);
+              t = t.replaceAll('{q}', nhl_data.dates[0].games[i].abstractGameState);
+              t = t.replaceAll('{date}', this.getDayOfWeek(matchDate));
+              t = t.replaceAll('{time}', this.getGameTime(matchDate));
               if (this.config.my_team == nhl_data.dates[0].games[i].v) {
-                t = t.replace('{myteamv}', " nhl-card-bold");
-                t = t.replace('{myteamv}', " nhl-card-bold");
-                t = t.replace('{myteamh}', "");
-                t = t.replace('{myteamh}', "");
+                t = t.replaceAll('{myteamv}', " nhl-card-bold");
+                t = t.replaceAll('{myteamh}', "");
               }
               else if (this.config.my_team == nhl_data.dates[0].games[i].h) {
-                t = t.replace('{myteamv}', "");
-                t = t.replace('{myteamv}', "");
-                t = t.replace('{myteamh}', " nhl-card-bold");
-                t = t.replace('{myteamh}', " nhl-card-bold");
+                t = t.replaceAll('{myteamv}', "");
+                t = t.replaceAll('{myteamh}', " nhl-card-bold");
               }
               else {
-                t = t.replace('{myteamh}', "");
-                t = t.replace('{myteamh}', "");
-                t = t.replace('{myteamv}', "");
-                t = t.replace('{myteamv}', "");
+                t = t.replaceAll('{myteamh}', "");
+                t = t.replaceAll('{myteamv}', "");
               }
               c += t;
             }
