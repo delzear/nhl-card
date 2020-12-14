@@ -21,12 +21,12 @@ class NhlCard extends HTMLElement {
 		<div class="nhl-card-match">
 			<div class="nhl-card-teams">
 				<div class="nhl-card-team">
-					<div class="nhl-card-team-image" style="background-image:url(assets/{v}.png);"></div>
+					<div class="nhl-card-team-image" style="background-image:url(/hacsfiles/nhl-card/assets/{v}.png);"></div>
 					<div class="nhl-card-team-name{myteamv}">{vnn}</div>
 					<div class="nhl-card-team-score{myteamv}">{vs}</div>
 				</div>
 				<div class="nhl-card-team">
-					<div class="nhl-card-team-image" style="background-image:url(assets/{h}.png);"></div>
+					<div class="nhl-card-team-image" style="background-image:url(/hacsfiles/nhl-card/assets/{h}.png);"></div>
 					<div class="nhl-card-team-name{myteamh}">{hnn}</div>
 					<div class="nhl-card-team-score{myteamh}">{hs}</div>
 				</div>
@@ -181,7 +181,7 @@ class NhlCard extends HTMLElement {
         break;
     }
   }
-    
+
   // The height of your card. Home Assistant uses this to automatically
   // distribute all cards over the available columns.
   getCardSize() {
