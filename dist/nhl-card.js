@@ -56,6 +56,8 @@ class NhlCard extends HTMLElement {
           let c = '';
           for (let i = 0; i < nhl_data.dates[0].games.length; i++) {
             if (this.getShowMatch(nhl_data.dates[0].games[i])) {
+              let matchDate = getDateFromNHLString(nhl_data.dates[0].games[i].gameDate);
+
               let t = this.match_template.replace('{vnn}', nhl_data.dates[0].games[i].teams.away.team.name);
               t = t.replace('{hnn}', nhl_data.dates[0].games[i].teams.home.team.name);
               t = t.replace('{v}', nhl_data.dates[0].games[i].teams.away.team.id);
@@ -63,7 +65,7 @@ class NhlCard extends HTMLElement {
               t = t.replace('{vs}', nhl_data.dates[0].games[i].teams.away.score);
               t = t.replace('{hs}', nhl_data.dates[0].games[i].teams.home.score);
               t = t.replace('{q}', nhl_data.dates[0].games[i].abstractGameState);
-              t = t.replace('{date}', nhl_data.dates[0].games[i].gameDate);
+              t = t.replace('{date}', getDayOfWeek(matchDate));
               t = t.replace('{time}', nhl_data.dates[0].games[i].gameDate + 'PM EST');
               if (this.config.my_team == nhl_data.dates[0].games[i].v) {
                 t = t.replace('{myteamv}', " nhl-card-bold");
@@ -156,30 +158,16 @@ class NhlCard extends HTMLElement {
     }
   }
 
-  getDayOfWeek(abbv) {
-    switch (abbv) {
-      case 'Mon':
-        return "Monday";
-        break;
-      case 'Tue':
-        return "Tuesday";
-        break;
-      case 'Wed':
-        return "Wednesday";
-        break;
-      case 'Thu':
-        return "Thursday";
-        break;
-      case 'Fri':
-        return "Friday";
-        break;
-      case 'Sat':
-        return "Saturday";
-        break;
-      case 'Sun':
-        return "Sunday";
-        break;
-    }
+  getDateFromNHLString(dateStr) {
+    //2020-07-30T20:00:00Z
+    return new Date(dateStr);
+  }
+
+  getDayOfWeek(date) {
+    return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][date.getDay()];
+  }
+  getGameTime(date) {
+    return date.getHours() + ":" + getMinutes();
   }
 
   // The height of your card. Home Assistant uses this to automatically
