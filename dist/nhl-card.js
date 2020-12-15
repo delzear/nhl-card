@@ -6,7 +6,7 @@ class NhlCard extends HTMLElement {
 .nhl-card-match{display: flex;flex-flow: row wrap;height:70px;min-width:190px;margin:1px;}
 .nhl-card-teams{flex: 1 1;}
 .nhl-card-team{display: flex;flex-flow: row;}
-.nhl-card-team-image{background-size:contain;height:35px;width:35px;}
+.nhl-card-team-image{background-size:contain;height:35px;width:35px;background-repeat:no-repeat;background-position:center center}
 .nhl-card-team-name{flex: 1 1;vertical-align:middle;line-height:35px;padding-left:5px;white-space:nowrap;overflow:hidden;}
 .nhl-card-team-score{width:25px;vertical-align:middle;line-height:35px;padding-right:5px;text-align:right;}
 .nhl-card-period{width:15px;line-height:70px;vertical-align:middle;padding-right:5px;text-align:right;font-size:12px;}
@@ -49,37 +49,47 @@ class NhlCard extends HTMLElement {
   }
 
   render() {
-    fetch('https://statsapi.web.nhl.com/api/v1/schedule?startDate=2020-07-30&endDate=2020-08-05')
+    let today = new Date(2020, 6, 30);
+    today = this.addDays(today, today.getDay() * -1);
+    let tmrow = new Date(2020, 6, 30);
+    tmrow = this.addDays(tmrow, 7);
+    let start = today.getFullYear() + "-" + this.pad(today.getMonth() + 1, 2) + '-' + this.pad(today.getDate(), 2);
+    let end = tmrow.getFullYear() + "-" + this.pad(tmrow.getMonth() + 1, 2) + '-' + this.pad(tmrow.getDate(), 2);
+    fetch('https://statsapi.web.nhl.com/api/v1/schedule?startDate=' + start + '&endDate=' + end)
       .then((response) => {
         response.json().then((nhl_data) => {
           this.card.header = "Today's NHL Games";
           let c = '';
-          for (let i = 0; i < nhl_data.dates[0].games.length; i++) {
-            if (this.getShowMatch(nhl_data.dates[0].games[i])) {
-              let matchDate = this.getDateFromNHLString(nhl_data.dates[0].games[i].gameDate);
+          if (nhl_data.dates.length > 0) {
+            for (let j = 0; j < nhl_data.dates.length; j++) {
+              for (let i = 0; i < nhl_data.dates[j].games.length; i++) {
+                if (this.getShowMatch(nhl_data.dates[j].games[i])) {
+                  let matchDate = this.getDateFromNHLString(nhl_data.dates[j].games[i].gameDate);
 
-              let t = this.match_template.replaceAll('{vnn}', nhl_data.dates[0].games[i].teams.away.team.name);
-              t = t.replaceAll('{hnn}', nhl_data.dates[0].games[i].teams.home.team.name);
-              t = t.replaceAll('{v}', nhl_data.dates[0].games[i].teams.away.team.id);
-              t = t.replaceAll('{h}', nhl_data.dates[0].games[i].teams.home.team.id);
-              t = t.replaceAll('{vs}', nhl_data.dates[0].games[i].teams.away.score);
-              t = t.replaceAll('{hs}', nhl_data.dates[0].games[i].teams.home.score);
-              t = t.replaceAll('{q}', nhl_data.dates[0].games[i].abstractGameState);
-              t = t.replaceAll('{date}', this.getDayOfWeek(matchDate));
-              t = t.replaceAll('{time}', this.getGameTime(matchDate));
-              if (this.config.my_team == nhl_data.dates[0].games[i].v) {
-                t = t.replaceAll('{myteamv}', " nhl-card-bold");
-                t = t.replaceAll('{myteamh}', "");
+                  let t = this.match_template.replaceAll('{vnn}', this.getTeamName(nhl_data.dates[j].games[i].teams.away.team.id));
+                  t = t.replaceAll('{hnn}', this.getTeamName(nhl_data.dates[j].games[i].teams.home.team.id));
+                  t = t.replaceAll('{v}', nhl_data.dates[j].games[i].teams.away.team.id);
+                  t = t.replaceAll('{h}', nhl_data.dates[j].games[i].teams.home.team.id);
+                  t = t.replaceAll('{vs}', nhl_data.dates[j].games[i].teams.away.score);
+                  t = t.replaceAll('{hs}', nhl_data.dates[j].games[i].teams.home.score);
+                  t = t.replaceAll('{q}', this.getGameStatus(nhl_data.dates[j].games[i].status.abstractGameState));
+                  t = t.replaceAll('{date}', this.getDayOfWeek(matchDate));
+                  t = t.replaceAll('{time}', this.getGameTime(matchDate));
+                  if (this.config.my_team == nhl_data.dates[j].games[i].teams.away.team.id) {
+                    t = t.replaceAll('{myteamv}', " nhl-card-bold");
+                    t = t.replaceAll('{myteamh}', "");
+                  }
+                  else if (this.config.my_team == nhl_data.dates[j].games[i].teams.home.team.id) {
+                    t = t.replaceAll('{myteamv}', "");
+                    t = t.replaceAll('{myteamh}', " nhl-card-bold");
+                  }
+                  else {
+                    t = t.replaceAll('{myteamh}', "");
+                    t = t.replaceAll('{myteamv}', "");
+                  }
+                  c += t;
+                }
               }
-              else if (this.config.my_team == nhl_data.dates[0].games[i].h) {
-                t = t.replaceAll('{myteamv}', "");
-                t = t.replaceAll('{myteamh}', " nhl-card-bold");
-              }
-              else {
-                t = t.replaceAll('{myteamh}', "");
-                t = t.replaceAll('{myteamv}', "");
-              }
-              c += t;
             }
           }
           if (c == '' && this.config.only_today) {
@@ -126,17 +136,15 @@ class NhlCard extends HTMLElement {
   getShowMatch(match) {
     let i_today;
     if (this.config.only_today_debug) {
-      i_today = this.config.only_today_debug
+      i_today = new Date(this.config.only_today_debug);
     }
     else {
-      let today = new Date();
-
-      i_today = parseInt('' + today.getFullYear() + ('0' + (today.getMonth() + 1)).slice(-2) + ('0' + today.getDate()).slice(-2) + '00');
+      i_today = new Date();
     }
+    let matchDate = this.getDateFromNHLString(match.gameDate);
+    let is_today = (matchDate >= i_today && matchDate <= (this.addDays(i_today, 1)));
 
-    let is_today = (match.eid >= i_today && match.eid <= (i_today + 99));
-
-    let has_my_team = (match.v == this.config.my_team || match.h == this.config.my_team)
+    let has_my_team = (match.teams.away.team.id == this.config.my_team || match.teams.home.team.id == this.config.my_team)
 
     if (this.config.only_today && this.config.only_my_team) {
       return (is_today && has_my_team);
@@ -145,7 +153,7 @@ class NhlCard extends HTMLElement {
       return is_today;
     }
     else if (!this.config.only_today && this.config.only_my_team) {
-      return only_my_team;
+      return has_my_team;
     }
     else { // (!this.config.only_today && !this.config.only_my_team)
       return true;
@@ -161,7 +169,76 @@ class NhlCard extends HTMLElement {
     return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][date.getDay()];
   }
   getGameTime(date) {
-    return date.getHours() + ":" + getMinutes();
+    return this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2);
+  }
+  getGameStatus(gameState) {
+    switch (gameState) {
+      case "Final":
+        return "F";
+      default:
+        return gameState;
+    }
+  }
+  getTeamName(teamId) {
+    let teams = [
+      "",
+      "Devils",
+      "Islanders",
+      "Rangers",
+      "Flyers",
+      "Penguins",
+      "Bruins",
+      "Sabres",
+      "Canadiens",
+      "Senators",
+      "Maple Leafs",
+      "",
+      "Hurricanes",
+      "Panthers",
+      "Lightning",
+      "Capitals",
+      "Blackhawks",
+      "Red Wings",
+      "Predators",
+      "Blues",
+      "Flames",
+      "Avalanches",
+      "Oilers",
+      "Canucks",
+      "Ducks",
+      "Stars",
+      "Kings",
+      "",
+      "Sharks",
+      "Blue Jackets",
+      "Wild",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Jets",
+      "Coyotes",
+      "Golden Knights",
+      "Kracken"
+    ];
+    return teams[teamId];
   }
 
   // The height of your card. Home Assistant uses this to automatically
@@ -169,6 +246,16 @@ class NhlCard extends HTMLElement {
   getCardSize() {
     return 3;
   }
+  pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
+  addDays(date, days) {
+    date.setDate(date.getDate() + days);
+    return date;
+  }
+
 }
 
 customElements.define('nhl-card', NhlCard);
