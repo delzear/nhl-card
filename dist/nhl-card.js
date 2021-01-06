@@ -39,7 +39,7 @@ class NhlCard extends HTMLElement {
   set hass(hass) {
     if (!this.content) {
       this.card = document.createElement('ha-card');
-      this.card.header = "Today's NHL Games";
+      this.card.header = "This week's NHL Games";
       this.content = document.createElement('div');
       this.content.className = 'card-content';
       this.card.appendChild(this.content);
@@ -49,16 +49,22 @@ class NhlCard extends HTMLElement {
   }
 
   render() {
-    let today = new Date(2020, 6, 30);
+    let today = new Date();
+    let tmrow = new Date();
+    if (this.config.only_today_debug) {
+      today = new Date(this.config.only_today_debug);
+      tmrow = new Date(this.config.only_today_debug);
+    }
     today = this.addDays(today, today.getDay() * -1);
-    let tmrow = new Date(2020, 6, 30);
+    tmrow = this.addDays(tmrow, tmrow.getDay() * -1);
     tmrow = this.addDays(tmrow, 7);
     let start = today.getFullYear() + "-" + this.pad(today.getMonth() + 1, 2) + '-' + this.pad(today.getDate(), 2);
     let end = tmrow.getFullYear() + "-" + this.pad(tmrow.getMonth() + 1, 2) + '-' + this.pad(tmrow.getDate(), 2);
     fetch('https://statsapi.web.nhl.com/api/v1/schedule?startDate=' + start + '&endDate=' + end)
+      //fetch('https://bdfed.stitch.mlbinfra.com/bdfed/transform-mlb-scoreboard?sportId=1&startDate=2020-10-27&endDate=2020-10-27')
       .then((response) => {
         response.json().then((nhl_data) => {
-          this.card.header = "Today's NHL Games";
+          this.card.header = "This week's NHL Games";
           let c = '';
           if (nhl_data.dates.length > 0) {
             for (let j = 0; j < nhl_data.dates.length; j++) {
