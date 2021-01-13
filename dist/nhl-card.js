@@ -172,7 +172,7 @@ class NhlCard extends HTMLElement {
   }
 
   getDayOfWeek(date) {
-    return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][date.getDay()];
+    return ["","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][date.getDay()];
   }
   getGameTime(date) {
     return this.pad(date.getHours(), 2) + ":" + this.pad(date.getMinutes(), 2);
