@@ -181,6 +181,8 @@ class NhlCard extends HTMLElement {
     switch (gameState) {
       case "Final":
         return "F";
+      case "Preview":
+        return "";
       default:
         return gameState;
     }
