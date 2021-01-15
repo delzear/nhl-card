@@ -9,7 +9,7 @@ class NhlCard extends HTMLElement {
 .nhl-card-team-image{background-size:contain;height:35px;width:35px;background-repeat:no-repeat;background-position:center center}
 .nhl-card-team-name{flex: 1 1;vertical-align:middle;line-height:35px;padding-left:5px;white-space:nowrap;overflow:hidden;}
 .nhl-card-team-score{width:25px;vertical-align:middle;line-height:35px;padding-right:5px;text-align:right;}
-.nhl-card-period{width:15px;line-height:70px;vertical-align:middle;padding-right:5px;text-align:right;font-size:12px;}
+.nhl-card-period{width:15px;line-height:70px;vertical-align:middle;padding-right:5px;text-align:left;font-size:12px;}
 .nhl-card-bold{font-weight:bold;}
 </style>
 <div class="nhl-card-content">{nhl-card}</div>
